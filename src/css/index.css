@@ -1,0 +1,175 @@
+* {
+  padding: 0;
+  margin: 0;
+  font-family: Georgia, serif;
+}
+
+:root {
+    --white: #F0EFEB;
+    --pink: #B294AD;
+    --blue: #C2CCD6;
+    --green: #7C8D7D;
+    --orange: #D9966E;
+}
+
+#root {
+  height: 100vh;
+  background-color: var(--blue);
+}
+
+nav.home-header {
+    background-color: var(--pink);
+    height: 65px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+nav.home-header > h1 {
+    padding: 10px;
+    line-height: 45px;
+}
+
+nav.home-header > h1 > a {
+    text-decoration: none;
+    color: black;
+}
+
+nav.home-header > div {
+    padding: 8px 4px;
+    border-radius: 50%;
+}
+
+nav.home-header > div.menuHidden:hover {
+    background-color: var(--green);
+}
+
+nav.home-header > div > ul.menuHidden {
+    display: none;
+}
+
+nav.home-header > div > ul {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 55px;
+    right: 0;
+    background-color: var(--pink);
+}
+
+nav.home-header > div > ul > a {
+    text-decoration: none;
+    color: black;
+    padding: 5px 30px 0 5px;
+}
+
+nav.home-header > div > ul > a:hover {
+    background-color: var(--green);
+}
+
+main.home-menu-container > h2 {
+    text-align: center;
+    padding: 50px;
+}
+
+main.home-menu-container > section.home-menu-box {
+    width: 60%;
+    height: 350px;
+    margin: auto;
+    display: flex;
+    gap: 10px;
+    position: relative;
+}
+
+main.home-menu-container > section.home-menu-box > div.arrow {
+    background-color: var(--pink);
+    border-radius: 50%;
+    padding: 5px;
+    position: absolute;
+    /*cursor: pointer;*/
+    cursor: not-allowed; /*temporary*/
+}
+
+main.home-menu-container > section.home-menu-box > div.arrow:hover {
+    background-color: var(--green);
+}
+
+main.home-menu-container > section.home-menu-box > div.arrow > p {
+    font-size: 30px;
+    line-height: 30px;
+    padding-bottom: 2px;
+}
+
+main.home-menu-container > section.home-menu-box > div.left-arrow {
+    left: -20px;
+    top: 155px;
+}
+
+main.home-menu-container > section.home-menu-box > div.left-arrow:hover {
+    background-color: var(--green);
+}
+
+main.home-menu-container > section.home-menu-box > div.right-arrow {
+    right: -20px;
+    bottom: 155px;
+}
+
+main.home-menu-container > section.home-menu-box > div.right-arrow:hover {
+    background-color: var(--green);
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div {
+    width: 33%;
+    display: grid;
+    grid-template-rows: 1fr 40px 70px;
+    grid-template-areas: 
+        "picture"
+        "name"
+        "description";
+    background-color: var(--pink);
+    cursor: pointer;
+    border: 2px solid var(--pink);
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div:hover {
+    background-color: var(--green);
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div > a {
+    text-decoration: none;
+    color: black;
+    grid-area: picture;
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div > a > div {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div:nth-child(1) > a > div {
+    background-image: url("/images/quizly.png");
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div:nth-child(2) > a > div {
+    background-image: url("/images/background.jpg");
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div:nth-child(3) > a > div {
+    background-image: url("/images/sudoku.png");
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div > a > h3 {
+    grid-area: name;
+    text-align: center;
+    padding: 10px;
+}
+
+main.home-menu-container > section.home-menu-box > div.home-menu-div > a > p {
+    grid-area: description;
+    padding: 10px;
+    padding-top: 0px;
+    text-align: center;
+}

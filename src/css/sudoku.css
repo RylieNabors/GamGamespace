@@ -1,0 +1,158 @@
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+section.sudoku-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+}
+
+section.sudoku-head > span {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+section.sudoku-head > span > h2 {
+    font-weight: normal;
+    font-size: 1.1rem;
+    padding-left: 6px;
+}
+
+hr {
+    margin-bottom: 20px;
+}
+
+div.board {
+    background-color: white;
+    margin: 0 auto;
+    width: 450px;
+    height: 450px;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    margin-bottom: 20px;
+    opacity: 1;
+    position: relative;
+}
+
+div.board > div.gameOver {
+    position: absolute;
+    opacity: 2;
+    width: 400px;
+    height: 100px;
+    background-color: lightblue;
+    left: 25px;
+    top: 175px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+
+div.board > div.gameOver > p:nth-child(1) {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+div.board > div.won {
+    background-color: #10A95B;
+}
+
+div.board > div.lost {
+    background-color: #EC5D49;
+}
+
+div.board > div.tile {
+    border: 1px solid gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.board > div.tile:hover {
+    background-color: lightgrey;
+}
+
+div.board > div.wrong_guess {
+    color: #EC5D49;
+}
+
+div.board > div.right_guess {
+    color: darkgreen;
+}
+
+div.board > div.left_border {
+    border-left: 3px solid black;
+}
+
+div.board > div.bottom_border {
+    border-bottom: 3px solid black;
+}
+
+div.board > div.matches_selected {
+    background-color: #B294AD;
+}
+
+div.digits {
+    margin: 10px auto;
+    width: 450px;
+    height: 50px;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-gap: 4px;
+}
+
+div.digits > button.number {
+    border: 2px solid black;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+div.digits > button.disabled {
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 20px,
+        black 20px,
+        black 40px
+    );
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent 0 5px,
+        black 5px 10px
+    );
+    cursor: not-allowed;
+}
+
+div.digits > button.num_selected {
+    background-color: grey;
+}
+
+div.digits > button.num_selected:hover {
+    background-color: grey
+}
+
+div.digits > button:hover {
+    background-color: lightgrey;
+}
+
+div.digits > button.num_not_selected {
+    background-color: white;
+}
+
+button.new-game {
+    display: block;
+    margin: 40px auto;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button.new-game:hover {
+    background-color: lightgrey;
+}

@@ -1,0 +1,320 @@
+* {
+  padding: 0;
+  margin: 0;
+  font-family: Georgia, serif;
+}
+
+#root {
+  height: 100vh;
+}
+
+main.main-container { 
+  height: calc(100% - 65px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /*background: linear-gradient(
+    90deg, 
+    rgba(4, 137, 152, 1) 0%, 
+    rgba(59, 180, 193, 1) 52%, 
+    rgba(4, 137, 152, 1) 100%
+  );*/
+  background-image: url("/images/background.jpg");
+}
+
+/* ------------------- Shared styles for quiz boxes --------------------- */
+main.main-container > section.quiz-container{
+  width: 65%;
+  max-width: 500px;
+  height: 65%;
+  max-height: 500px;
+  border-radius: 20px;
+  background: #e3e3e3;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+
+/* ------------------- Quiz Introduction --------------------- */
+main.main-container > section.introduction-popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+main.main-container > section.introduction-popup > h1 {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+  margin-top: 20px;
+}
+
+main.main-container > section.introduction-popup > h2 {
+  font-weight: normal;
+}
+
+main.main-container > section.introduction-popup > button {
+  width: 100px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 40px;
+  background: #3bb4c1;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+main.main-container > section.introduction-popup > button > a {
+  text-decoration: none;
+  color: black;
+}
+
+main.main-container > section.introduction-popup > button:hover {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+/*------------------------- Question box -----------------------*/
+main.main-container > section.question-box {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: 40px 1fr 2fr 40px;
+  grid-template-areas:
+    "h h h h h"
+    "q q q q q"
+    "a a a a a"
+    "f f f f f";
+  position: relative;
+}
+
+main.main-container > section.question-box > header {
+  grid-area: h;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid black;
+}
+
+main.main-container > section.question-box > header > span > button {
+  margin-left: 7px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 2px;
+}
+
+main.main-container > section.question-box h1.question {
+  grid-area: q;
+  text-align: center;
+  align-self: center;
+  padding-top: 20px;
+}
+
+main.main-container > section.question-box > form.answers {
+  grid-area: a;
+  display: grid;
+  grid-template: repeat(2, 1fr) / repeat(2, 1fr);
+}
+
+main.main-container > section.question-box > form.answers > div.opt {
+  height: calc(100% - 3rem);
+  width: 200px;
+  justify-self: center;
+  align-self: center;
+}
+
+input[type="radio"].answer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+input[type="radio"].answer:checked + label {
+  background-color: #FBEC5D;
+}
+
+input[type="radio"].answer + label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 20px;
+}
+
+input[type="radio"].answer + label.correct {
+  background-color: #10A95B;
+}
+
+input[type="radio"].answer + label.wrong {
+  background-color: #EC5D49;
+}
+
+input[type="radio"].answer + label::before {
+  content: "";
+  padding: 5px 7px;
+  margin: 0 6px;
+  border-radius: 50%;
+}
+
+input[type="radio"]#A + label::before {
+  content: "A";
+  background-color: coral;
+}
+
+input[type="radio"]#B + label::before {
+  content: "B";
+  background-color: olive;
+}
+
+input[type="radio"]#C + label::before {
+  content: "C";
+  background-color: #C884E8;
+}
+
+input[type="radio"]#D + label::before {
+  content: "D";
+  background-color: darkcyan;
+}
+
+main.main-container > section.question-box > form.answers > div.opt:nth-child(1) {
+  margin-left: 1rem;
+}
+
+main.main-container > section.question-box > form.answers > div.opt:nth-child(2) {
+  margin-right: 1rem;
+}
+
+main.main-container > section.question-box > form.answers > div.opt:nth-child(3) {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+main.main-container > section.question-box > form.answers > div.opt:nth-child(4) {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+main.main-container > section.question-box > footer {
+  grid-area: f;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid black;
+}
+
+main.main-container > section.question-box > footer > button {
+  padding: 5px 10px;
+  margin-left: auto;
+  margin-right: 20px;
+  border-radius: 10px;
+  align-self: center;
+  cursor: pointer;
+}
+
+/*------------------------- Quiz Hint -----------------------*/
+
+main.main-container > section.question-box > div.hint_section {
+  position: absolute;
+  left: 102%;
+  bottom: 66%;
+  width: 300px;
+  height: 150px;
+  padding: 10px;
+  overflow-y: auto;
+  border-radius: 20px;
+}
+
+main.main-container > section.question-box > div.available {
+  background-color: #FBEC5D;
+}
+
+main.main-container > section.question-box > div.not_available {
+  background-color: #EC5D49;
+}
+
+/*------------------------- Quiz Summary -----------------------*/
+main.summary {
+  gap: 15px;
+}
+
+main.summary > section.summary-box {
+  display: grid;
+  grid-template-rows: 40px 1fr 50px;
+  grid-template-areas: "s" "c" "b";
+}
+
+main.summary > section.summary-box > header {
+  grid-area: s;
+  align-self: center;
+  padding: 10px;
+  border-bottom: 1px solid black;
+}
+
+main.summary > section.summary-box > div {
+  grid-area: c;
+  padding: 10px;
+  overflow-y: auto;
+  border-bottom: 1px solid black;
+}
+
+main.summary > section.summary-box > div > h2 {
+  padding-bottom: 5px;
+}
+
+main.summary > section.summary-box > div > span {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 20px 5px 20px;
+}
+
+main.summary > section.summary-box > div > span > p:nth-child(1) {
+  max-width: 300px;
+}
+
+main.summary > section.summary-box > div > span > p:nth-child(2) {
+  padding: 5px 10px;
+  background-color: var(--orange);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+main.summary > section.summary-box > button {
+  grid-area: b;
+  border: none;
+  margin: 10px 150px;
+  background-color: var(--pink);
+}
+
+main.summary > section.summary-box > button:hover {
+  background-color: var(--green);
+}
+
+main.summary > section.summary-box > button > a {
+  text-decoration: none;
+  color: black;
+}
+
+main.summary > section.recommendation {
+  padding: 10px;
+  width: 300px;
+}
+
+main.summary > section.recommendation > p {
+  padding-bottom: 10px;
+}
+
+main.summary > section.recommendation > ul,
+main.summary > section.recommendation > ol {
+  margin-left: 20px;
+}
+
+main.summary > section.recommendation > ul > li,
+main.summary > section.recommendation > ol > li {
+  margin-bottom: 10px;
+}
