@@ -1,6 +1,8 @@
 import '../css/sudoku.css'
 import { useEffect, useRef, useState } from "react"
 import { clsx } from 'clsx'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
 
 export function Sudoku() {
     // placeholder data
@@ -35,6 +37,8 @@ export function Sudoku() {
     const [errorCount, setErrorCount] = useState(0)
     const [finishedNums, setFinishedNums] = useState("")
     const [start, setStart] = useState(true)
+    const [hintAvailable, setHintAvailable] = useState(true)
+    const [hintShowing, setHintShowing] = useState(false)
     console.log('Sudoku rendered...')
 
     // static values
@@ -50,7 +54,7 @@ export function Sudoku() {
     const has9ofSelectedNum = selectedNum !== 0 ? boardNums.join('').split(selectedNum.toString()).length - 1 === 9 : false;
     const selectedNumFinished = finishedNums.includes(selectedNum)
     const hasHitMaxErrors = errorCount === 3
-    const gameFinished = solution.length === boardNums.length && solution.every((v, i) => v === boardNums[i] && v !=='0');
+    const gameFinished = boardNums.length !== 0 && solution.length === boardNums.length && solution.every((v, i) => v === boardNums[i] && v !=='0');
 
     console.log('Game finished? :')
     console.log(gameFinished)
@@ -113,22 +117,36 @@ export function Sudoku() {
         setStart(true)
         setFinishedNums("")
         setErrorCount(0)
+        setHintAvailable(true)
     }
 
     function insertIntoBoard(cell, rIndex, cIndex) {
        console.log('Board update function called')
-       if (selectedNum === 0) return
-       console.log('selected num not 0')
+       if (hintShowing) {
+            console.log('Showing hint!')
+            setBoardNums(prev => {
+                const newArr = [...prev]
+                newArr[rIndex] = [...prev[rIndex]];
+                newArr[rIndex][cIndex] = solution[rIndex][cIndex];
+                const joinedString = newArr[rIndex].join('')
+                newArr[rIndex] = joinedString
+                return newArr;
+            })
+            setHintShowing(false)
+            return
+       }
+
+       const cellHas9Matches = boardNums.join('').split(cell.toString()).length - 1 === 9
+       if (cell !== '0' && !cellHas9Matches){
+            console.log('Changing selected number!')
+            setSelectedNum(cell)
+       }
 
        // determining if it was previously guessed and if that previous guess was wrong
        const prevGuessedNum = cell !== initialPuzzle.current[rIndex][cIndex] && cell !== '0'
        const prevGuessWrong = prevGuessedNum && cell !== solution[rIndex][cIndex]
        // determining if current guess is wrong (not stored as a guess yet)
        const isWrong = cell === '0' && selectedNum !== solution[rIndex][cIndex]
-
-       console.log('previously guessed: ' + prevGuessedNum)
-       console.log('previous guess wrong: ' + prevGuessWrong)
-       console.log('current guess Wrong: ' + isWrong)
 
        if (isWrong) {
             console.log('Wrong guess!')
@@ -223,18 +241,26 @@ export function Sudoku() {
         gameOver: true
     })
 
+    function showHint() {
+        setHintShowing(true)
+        setHintAvailable(false)
+    }
+
     return (
         <>
         <section className="sudoku-head">
             <h1>Sudoku</h1>
-            <span>{`${difficulty.current || '...Loading'}  |`}<h2>{`Mistakes: ${errorCount}/3`}</h2></span>
+            <span>{`${difficulty.current || '...Loading'}  |`}<h2>{`Mistakes: ${errorCount}/3`}</h2>
+                <button onClick={showHint} disabled={!hintAvailable} title="Show Hint"><FontAwesomeIcon icon={faLightbulb} /></button>
+            </span>
         </section>
         <hr />
         <div className="board">
             {(gameFinished || hasHitMaxErrors) ? <div className={gameOverClassName}>
                 <p>{hasHitMaxErrors ? "Game Lost!" : "Game Won!"}</p>
                 <p>{`Mistakes: ${errorCount}/3`}</p>
-            </div> : undefined}  
+            </div> : undefined} 
+            {hintShowing ? <p className="hint-message">Choose a cell to reveal.</p> : undefined}
             {board}
         </div>
         <div className="digits">

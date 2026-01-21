@@ -19,7 +19,11 @@ section.sudoku-head > span {
 section.sudoku-head > span > h2 {
     font-weight: normal;
     font-size: 1.1rem;
-    padding-left: 6px;
+    padding: 0 6px;
+}
+
+section.sudoku-head > span > button {
+    border-radius: 50%;
 }
 
 hr {
@@ -37,6 +41,18 @@ div.board {
     margin-bottom: 20px;
     opacity: 1;
     position: relative;
+}
+
+div.board > p.hint-message {
+    position: absolute;
+    width: 250px;
+    height: 50px;
+    background-color: var(--orange);
+    top: 50px;
+    left: 110%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 div.board > div.gameOver {
