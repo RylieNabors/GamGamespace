@@ -1,0 +1,181 @@
+main.die-page {
+    height: calc(100% - 65px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+main.die-page > section.die-container {
+    width: 65%;
+    max-width: 500px;
+    height: 65%;
+    max-height: 500px;
+    background: #e3e3e3;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+main.die-page > section.die-container:not(.score) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+main.die-page > section.die-container:not(.score) > p {
+    background-color: var(--orange);
+    width: 320px;
+    align-self: center;
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px 0;
+    border-radius: 10px;
+}
+
+main.die-page > section.die-container > div {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+main.die-page > section.die-container > div > button {
+    width: 50px;
+    height: 50px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    border: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    cursor: pointer;
+}
+
+main.die-page > section.die-container > div > button.held {
+    border: 4px solid #59E391;
+}
+
+main.die-page > section.die-container > div > button.die-1 {
+    grid-template-areas: ". . ." ". d1 ." ". . .";
+}
+
+main.die-page > section.die-container > div > button.die-2 {
+    grid-template-areas: ". . d1" ". . ." "d2 . .";
+}
+
+main.die-page > section.die-container > div > button.die-3 {
+    grid-template-areas: ". . d1" ". d2 ." "d3 . .";
+}
+
+main.die-page > section.die-container > div > button.die-4 {
+    grid-template-areas: "d1 . d2" ". . ." "d3 . d4";
+}
+
+main.die-page > section.die-container > div > button.die-5 {
+    grid-template-areas: "d1 . d2" ". d3 ." "d4 . d5";
+}
+
+main.die-page > section.die-container > div > button.die-6 {
+    grid-template-areas: "d1 . d2" "d3 . d4" "d5 . d6";
+}
+
+main.die-page > section.die-container > div > button > div.dot {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    justify-self: center;
+    align-self: center;
+}
+
+main.die-page > section.die-container > div > button > div.dot:nth-child(1) {
+    grid-area: d1;
+}
+
+main.die-page > section.die-container > div > button > div.dot:nth-child(2) {
+    grid-area: d2;
+}
+
+main.die-page > section.die-container > div > button > div.dot:nth-child(3) {
+    grid-area: d3;
+}
+
+main.die-page > section.die-container > div > button > div.dot:nth-child(4) {
+    grid-area: d4;
+}
+
+main.die-page > section.die-container > div > button > div.dot:nth-child(5) {
+    grid-area: d5;
+}
+
+main.die-page > section.die-container > div > button > div.dot:nth-child(6) {
+    grid-area: d6;
+}
+
+main.die-page > section.die-container > button {
+    display: block;
+    margin: 10px auto;
+    width: 200px;
+    padding: 5px 0;
+    border-radius: 5px;
+    background-color: var(--pink);
+    cursor: pointer;
+}
+
+main.die-page > section.die-container > button.first {
+    margin-top: auto;
+}
+
+main.die-page > section.die-container > button.third {
+    margin-bottom: 50px;
+}
+
+main.die-page > section.die-container > button:hover {
+    background-color: var(--green);
+}
+
+main.die-page > section.die-container:not(.score) > span {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    gap: 10px;
+}
+
+main.die-page > section.score > p.emphasized {
+    padding: 5px 0 5px 40px;
+    margin-top: 15px;
+    background-color: var(--pink);
+}
+
+main.die-page > section.score > span {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 55px;
+    padding: 1px 5px 0 2px;
+}
+
+main.die-page > section.score > span.selectable:hover {
+    cursor: pointer;
+    background-color: var(--orange);
+}
+
+main.die-page > section.score > span.emphasized {
+    padding: 5px 55px 5px 40px;
+    margin: 15px 0 0 0;
+    background-color: var(--pink);
+}
+
+main.die-page > div.game-over {
+    opacity: 3;
+    position: absolute;
+    background-color: var(--green);
+    width: 400px;
+    height: 100px;
+    border-radius: 20px;
+    top: 300px;
+}
+
+main.die-page > div.game-over > p {
+    text-align: center;
+}
+
+main.die-page > div.game-over > p:nth-child(1) {
+    margin-top: 30px;
+}

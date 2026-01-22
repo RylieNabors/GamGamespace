@@ -23,7 +23,7 @@ export function Layout() {
                 <div className={menuClassName} onClick={showNav}><FontAwesomeIcon icon={faBars} size="2xl" />
                     <ul className={menuClassName}>
                         <Link to="quiz">Quizly</Link>
-                        <Link>Yahtzee</Link>
+                        <Link to="yahtzee">Yahtzee</Link>
                         <Link to="sudoku">Sudoku</Link>
                     </ul>
                 </div>

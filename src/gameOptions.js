@@ -11,7 +11,7 @@ const gameData = [
         "name": "Yahtzee",
         "imgUrl": "yahtzee",
         "description": "dice game",
-        "linkUrl": "blank"
+        "linkUrl": "yahtzee"
     },
     {
         "id": 3,
