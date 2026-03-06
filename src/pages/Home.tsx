@@ -1,4 +1,4 @@
-import {gameData} from "../gameOptions"
+import {gameData} from "../gameOptions.js"
 import { Link } from "react-router-dom"
 import '../css/index.css'
 

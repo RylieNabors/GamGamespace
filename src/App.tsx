@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import { Home } from "./pages/Home"
-import { Layout } from "./pages/Layout"
-import { QuizIntro } from "./pages/QuizIntro"
-import { Sudoku } from "./pages/Sudoku"
-import { Yahtzee } from "./pages/Yahtzee"
-import { PageNotFound } from "./pages/PageNotFound"
+import { Home } from "./pages/Home.js"
+import { Layout } from "./pages/Layout.js"
+import { QuizIntro } from "./pages/QuizIntro.js"
+import { Sudoku } from "./pages/Sudoku.js"
+import { Yahtzee } from "./pages/Yahtzee.js"
+import { PageNotFound } from "./pages/PageNotFound.js"
 
-import { Question } from "./components/Question"
+import { Question } from "./components/Question.js"
 
 function App() {
   console.log("parent render")

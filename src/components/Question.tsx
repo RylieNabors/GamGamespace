@@ -1,6 +1,6 @@
 import '../css/quiz.css'
-import { QuizSummary } from './QuizSummary'
-import { QuizHint } from './QuizHint'
+import { QuizSummary } from './QuizSummary.js'
+import { QuizHint } from './QuizHint.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
 import { useState, useEffect, useRef } from "react"
