@@ -3,15 +3,16 @@ import { useState } from "react"
 import { clsx } from 'clsx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import type {JSX} from "react"
 
-export function Layout() {
-    const [navShown, setNavShown] = useState(false)
+export function Layout(): JSX.Element {
+    const [navShown, setNavShown] = useState<boolean>(false)
 
-    function showNav() {
+    function showNav(): void {
         setNavShown(prev => !prev)
     }
 
-    const menuClassName = clsx({
+    const menuClassName: string = clsx({
         menuHidden: navShown === false,
     })
     console.log(navShown)

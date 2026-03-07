@@ -3,21 +3,38 @@ import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
 import { clsx } from 'clsx'
 import { useEffect, useRef, useState } from "react"
 import { InferenceClient } from '@huggingface/inference'
+import type {JSX} from "react"
 
-export function QuizHint({question, score, closeHint, setScore, answer}) {
+interface QuizHintProps {
+    question: string | undefined,
+    score: number,
+    closeHint: (p: boolean) => void,
+    setScore: React.Dispatch<React.SetStateAction<number>>,
+    answer: string | undefined
+}
+
+export function QuizHint({question, score, closeHint, setScore, answer}: QuizHintProps): JSX.Element | undefined {
     console.log("QuizHint rendered...")
+    if (typeof question === undefined) {
+        console.log("Question is undefined")
+        return undefined
+    }
+    if (typeof answer === undefined) {
+        console.log("Answer is undefined")
+        return undefined
+    }
     // refs
-    const scoreUpdated = useRef(false)
-    const prevScore = useRef(score)
+    const scoreUpdated = useRef<boolean>(false)
+    const prevScore = useRef<number>(score)
     // state
-    const [hint, setHint] = useState("")
+    const [hint, setHint] = useState<string>("")
 
     const HF_ACCESS_TOKEN = import.meta.env.VITE_HF_KEY
     const hf = new InferenceClient(HF_ACCESS_TOKEN)
 
-    const questionObj = {
-        "question": question,
-        "answer": answer
+    const questionObj: {question: string, answer: string} = {
+        "question": question as string,
+        "answer": answer as string
     }
 
     useEffect(() => {
@@ -36,11 +53,19 @@ export function QuizHint({question, score, closeHint, setScore, answer}) {
                         ],
                         max_tokens: 512,
                     })
+                    if (!response.ok) throw new Error('Error: Hugging Face response invalid')
+                    if (!("choices" in response && response.choices[0]?.message)) {
+                        throw new Error('Error: No choices in response')
+                    } 
                     let text = response.choices[0].message.content
-                    setHint(text.replace(/^<think>\s*<\/think>\s*/i, ""))
+                    if (typeof text === "string") setHint(text.replace(/^<think>\s*<\/think>\s*/i, ""))
                     setScore(prev => prev - 1)
                     
                 } catch (err) {
+                    if (!(err instanceof Error)) {
+                        console.error("Unknown error")
+                        return
+                    }
                     console.error(err.message)
                 }
             }
@@ -52,7 +77,7 @@ export function QuizHint({question, score, closeHint, setScore, answer}) {
         }
     }, [])
 
-    const hintClassName = clsx({
+    const hintClassName: string = clsx({
         available: prevScore.current > 0,
         not_available: prevScore.current <= 0,
         hint_section: true   

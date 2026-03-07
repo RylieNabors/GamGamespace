@@ -8,47 +8,69 @@ import { decode } from 'html-entities'
 import { clsx } from 'clsx'
 import Confetti from "react-confetti"
 import { useWindowSize } from 'react-use'
+import type {JSX} from "react"
 
 
-export function Question(props) {
+export function Question() {
+    type ResultsType = {
+        category: string,
+        type: "multiple" | "boolean"
+        difficulty: "easy" | "medium" | "hard",
+        question: string,
+        correct_answer: string,
+        incorrect_answers: string[]
+    }
+
+    type ResponseType = {
+        response_code: number,
+        results: ResultsType[]
+    }
+
+    type QuestionType = Pick<ResultsType, "category" | "difficulty" | "question"> & {
+        answers: string[],
+        correct: string
+    }
+
     // state values
-    const [questions, setQuestions] = useState([])
-    const [userAnswers, setUserAnswers] = useState([])
-    const [score, setScore] = useState(0)
-    const [qIndex, setQIndex] = useState(0)
-    const [showHintBool, setShowHintBool] = useState(false)
+    const [questions, setQuestions] = useState<QuestionType[]>([])
+    const [userAnswers, setUserAnswers] = useState<string[]>([])
+    const [score, setScore] = useState<number>(0)
+    const [qIndex, setQIndex] = useState<number>(0)
+    const [showHintBool, setShowHintBool] = useState<Boolean>(false)
 
     // Derived values
-    const gameOver = false
-    const isGuessed = typeof userAnswers[qIndex] !== 'undefined'
-    const isUserCorrect = userAnswers[qIndex] === questions[qIndex]?.correct
-    const showQuizSummary = questions.length!== 0 && qIndex == questions.length
+    const gameOver: boolean = false
+    const isGuessed: boolean = typeof userAnswers[qIndex] !== 'undefined'
+    const isUserCorrect: boolean = userAnswers[qIndex] === questions[qIndex]?.correct
+    const showQuizSummary: boolean = questions.length!== 0 && qIndex == questions.length
     //const showQuizSummary = true // temporary
 
     // Ref
-    const formRef = useRef(null)
+    const formRef = useRef<HTMLFormElement>(null)
 
     const {width, height} = useWindowSize()
 
     // create new array containing all responses and randomly shuffle them
-    function fisherYatesShuffle(arr, correctAns) {
-        const newArr = [...arr, correctAns]; 
-        for (let i = newArr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
+    function fisherYatesShuffle(arr: string[], correctAns: string): string[] {
+        const newArr: string[] = [...arr, correctAns]; 
+        for (let i: number = newArr.length - 1; i > 0; i--) {
+            const j: number = Math.floor(Math.random() * (i + 1));
             [newArr[i], newArr[j]] = [decode(newArr[j]), decode(newArr[i])];
         }
         return newArr;
     }
 
     useEffect(() => {
-        const abortController = new AbortController()
+        const abortController: AbortController = new AbortController()
+
         async function getQuestionsArray() {
             try {
-                const response = await fetch('https://opentdb.com/api.php?amount=10&type=multiple', {
+                const response: Response = await fetch('https://opentdb.com/api.php?amount=10&type=multiple', {
                     signal: abortController.signal
                 })
-                const data = await response.json()
-                const renderedQuestions = data.results.map(q => ({
+                if (!response.ok) throw new Error('API response error')
+                const data: ResponseType = await response.json()
+                const renderedQuestions: QuestionType[] = data.results.map((q: ResultsType) => ({
                     category: decode(q.category),
                     difficulty: q.difficulty,
                     question: decode(q.question),
@@ -59,45 +81,49 @@ export function Question(props) {
                 console.log(renderedQuestions)
                 setQuestions(renderedQuestions)
             } catch(err) {
+                if (!(err instanceof Error)) {
+                    console.error("Unknown Error")
+                    return
+                }
                 err.name === 'AbortError' 
-                ? console.log('Fetch aborted!') 
-                : console.log('Fetch Error: ' + err)
+                ? console.error('Fetch aborted!') 
+                : console.error('Fetch Error: ' + err)
             }
         }
         getQuestionsArray()
-        return () => abortController.abort()
+        return (): void => abortController.abort()
     }, [gameOver]); 
 
     console.log("Question rendered...")
     console.log("Score" + score)
     console.log("Guessed: " + isGuessed)
 
-    function incrementIndex() {
+    function incrementIndex(): void {
         console.log('incrementing index')
         if (qIndex < questions.length) setQIndex(prevIndex => prevIndex + 1)
         setShowHintBool(false)
     }
 
-    function handleSubmit(event) {
+    function handleSubmit(event: React.SubmitEvent<HTMLFormElement>){
         event.preventDefault()
-        const formEl = event.currentTarget 
-        const formData = new FormData(formEl)
-        const ans = formData.get("answer")
-        setUserAnswers(prevAns => [...prevAns, ans])
+        const formEl = event.currentTarget as EventTarget
+        const formData = new FormData(formEl as HTMLFormElement)
+        const ans: string = formData.get("answer") as string
+        setUserAnswers((prevAns: string[]): string[] => [...prevAns, ans])
         if (ans === questions[qIndex]?.correct) setScore(prevScore => prevScore + 1)
-        formEl.reset()
+        ;(formEl as HTMLFormElement).reset()
     }
 
-    function showHint() {
+    function showHint(): void {
         setShowHintBool(true)
         //if (score !== 0) setScore(prevScore => prevScore - 1)
     }
 
-    const answerElements =  questions[qIndex]?.answers.map((answer, index) => {
-        const isCorrect = isGuessed && answer === questions[qIndex].correct
-        const isNotCorrect = isGuessed && answer !== questions[qIndex].correct
+    const answerElements: JSX.Element[] | undefined =  questions[qIndex]?.answers.map((answer: string, index: number): JSX.Element => {
+        const isCorrect: boolean = isGuessed && answer === questions[qIndex]?.correct
+        const isNotCorrect: boolean = isGuessed && answer !== questions[qIndex]?.correct
 
-        const answerClassName = clsx({
+        const answerClassName: string = clsx({
             correct: isCorrect,
             wrong: isNotCorrect
         })
@@ -112,14 +138,12 @@ export function Question(props) {
         )
     })
 
-    function showCorrectAnswers() {
-        const correct_answers = questions.map(questionObj => questionObj.correct)
-        return correct_answers
+    function showCorrectAnswers(): string[] {
+        return questions.map((questionObj: QuestionType) => questionObj.correct)
     }
 
-    function showQuestions() {
-        const question_list = questions.map(questionObj => questionObj.question)
-        return question_list
+    function showQuestions(): string[] {
+        return questions.map((questionObj: QuestionType)=> questionObj.question)
     }
     
     return (

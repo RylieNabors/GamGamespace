@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import type {JSX} from "react"
 
 import { Home } from "./pages/Home.js"
 import { Layout } from "./pages/Layout.js"
@@ -9,7 +10,7 @@ import { PageNotFound } from "./pages/PageNotFound.js"
 
 import { Question } from "./components/Question.js"
 
-function App() {
+function App(): JSX.Element {
   console.log("parent render")
 
   return (

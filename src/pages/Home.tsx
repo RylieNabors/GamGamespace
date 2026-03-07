@@ -1,10 +1,12 @@
 import {gameData} from "../gameOptions.js"
+import type {gameDataType} from "../gameOptions.js"
 import { Link } from "react-router-dom"
 import '../css/index.css'
+import type {JSX} from "react"
 
-export function Home() {
+export function Home(): JSX.Element {
     console.log(gameData)
-    const gameOptions = gameData.map(game => {
+    const gameOptions: JSX.Element[] = gameData.map((game: gameDataType): JSX.Element => {
         console.log(game.imgUrl)
         return (
             <div key={game.id} className="home-menu-div">

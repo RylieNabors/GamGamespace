@@ -1,4 +1,12 @@
-const gameData = [
+export interface gameDataType {
+    id: number,
+    name: string,
+    imgUrl: string,
+    description: string,
+    linkUrl: string
+}
+
+export const gameData: gameDataType[] = [
     {
         "id": 1,
         "name": "Quizly",
@@ -21,5 +29,3 @@ const gameData = [
         "linkUrl": "sudoku"
     }
 ]
-
-export {gameData}

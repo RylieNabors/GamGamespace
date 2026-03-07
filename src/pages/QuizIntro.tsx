@@ -2,9 +2,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEarthAmericas } from '@fortawesome/free-solid-svg-icons'
 import '../css/quiz.css'
 import { Link } from "react-router-dom"
+import type {JSX} from "react"
 
 
-export function QuizIntro() {
+export function QuizIntro(): JSX.Element {
     console.log("QuizIntro rendered...")
     return (
         <main className="main-container">

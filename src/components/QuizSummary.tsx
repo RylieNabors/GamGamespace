@@ -3,16 +3,28 @@ import { Link } from "react-router-dom"
 import { InferenceClient } from '@huggingface/inference'
 import { nanoid } from 'nanoid'
 import ReactMarkdown from "react-markdown"
+import type {JSX} from "react"
 
-export function QuizSummary({score, correctAns, userAns, questions}) {
+interface QuizSummaryProps {
+    score: number,
+    correctAns: string[],
+    userAns: string[],
+    questions: string[]
+}
+
+export function QuizSummary({score, correctAns, userAns, questions}: QuizSummaryProps): JSX.Element {
     console.log('QuizSummary rendered...')
 
-    const responseGenerated = useRef(false)
-    const [recommendation, setRecommendation] = useState("")
+    const responseGenerated = useRef<boolean>(false)
+    const [recommendation, setRecommendation] = useState<string>("")
     const HF_ACCESS_TOKEN = import.meta.env.VITE_HF_KEY
     const hf = new InferenceClient(HF_ACCESS_TOKEN)
 
-    let missed_questions = correctAns.map((ans, index) => ({ans, 'orig': index}))
+    type MissedQuestionType = {
+        question: string | undefined,
+        answer: string
+    }
+    let missed_questions: MissedQuestionType[] = correctAns.map((ans: string, index: number) => ({ans, 'orig': index}))
                             .filter((ansObj, index) => ansObj.ans !== userAns[index])
                             .map(ansObj => {
                                 return {
@@ -39,19 +51,29 @@ export function QuizSummary({score, correctAns, userAns, questions}) {
                         ],
                         max_tokens: 512,
                     })
+                    if (!response.ok) throw new Error('Error: HuggingFace response invalid')
+                    if (!("choices" in response && response.choices[0]?.message)) {
+                        throw new Error('Error: No choices in response')
+                    }
                     const text = response.choices[0].message.content
-                    setRecommendation(text.replace(/^<think>\s*<\/think>\s*/i, ""))
+                    if (typeof text === "string") setRecommendation(text.replace(/^<think>\s*<\/think>\s*/i, ""))
                 } catch (err) {
+                    if (!(err instanceof Error)) {
+                        console.error("Unknown Error")
+                        return
+                    }
                     console.error(err.message)
                 }
             }
             getSummary()
 
-            return () => responseGenerated.current = true
+            return () => {
+                responseGenerated.current = true
+            }
         }
     }, [])
 
-    const missed_question_section = missed_questions.map(questionObj => {
+    const missed_question_section: JSX.Element[] = missed_questions.map((questionObj: MissedQuestionType): JSX.Element => {
         return (
             <span key={nanoid()}>
                 <p>{questionObj.question}</p>
@@ -60,7 +82,7 @@ export function QuizSummary({score, correctAns, userAns, questions}) {
         )
     })
 
-    const recommendation_section = recommendation.split(/\r?\n\r?\n+/).map(recStr => {
+    const recommendation_section: JSX.Element[] = recommendation.split(/\r?\n\r?\n+/).map((recStr: string): JSX.Element => {
         return (
             <ReactMarkdown key={nanoid()}>{recStr}</ReactMarkdown>
         )
