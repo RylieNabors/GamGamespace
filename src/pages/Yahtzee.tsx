@@ -1,97 +1,121 @@
 import { nanoid } from "nanoid"
 import { useState } from "react"
 import '../css/yahtzee.css'
+import type {JSX} from "react"
 
-export function Yahtzee() {
-    const scoreCardNums = {
-        ACES: 1,
-        TWOS: 2,
-        THREES: 3,
-        FOURS: 4,
-        FIVES: 5,
-        SIXES: 6
+export function Yahtzee(): JSX.Element {
+    enum scoreCardNums {
+        ACES= 1,
+        TWOS= 2,
+        THREES= 3,
+        FOURS= 4,
+        FIVES= 5,
+        SIXES= 6
     }
 
-    const INITIAL_SCORE = [
-        {'Aces': 0, 'isFilled': false},
-        {'Twos': 0, 'isFilled': false},
-        {'Threes': 0, 'isFilled': false},
-        {'Fours': 0, 'isFilled': false},
-        {'Fives': 0, 'isFilled': false},
-        {'Sixes': 0, 'isFilled': false},
-        {'3 of a kind': 0, 'isFilled': false},
-        {'4 of a kind': 0, 'isFilled': false},
-        {'Full house': 0, 'isFilled': false},
-        {'Sm. straight': 0, 'isFilled': false},
-        {'Lg. straight': 0, 'isFilled': false},
-        {'Yahtzee': 0, 'isFilled': false},
-        {'Chance': 0, 'isFilled': false},
-        {'Yahtzee bonus': 0, 'isFilled': false}
+    type LowerCategoryName = 'Aces' | 'Twos' | 'Threes' | 'Fours' | 'Fives' | 'Sixes'
+    type UpperCategoryName = '3 of a kind' | '4 of a kind' | 'Full house' | 'Sm. straight'
+                        | 'Lg. straight' | 'Yahtzee' | 'Chance' | 'Yahtzee bonus'
+    type CategoryName = LowerCategoryName | UpperCategoryName
+    type ScoreType = {
+        name: CategoryName,
+        score: number,
+        isFilled: boolean
+    }
+
+    const INITIAL_SCORE: ScoreType[] = [
+        {name: 'Aces', score: 0, isFilled: false},
+        {name: 'Twos', score: 0, isFilled: false},
+        {name:'Threes', score: 0, isFilled: false},
+        {name:'Fours', score: 0, isFilled: false},
+        {name:'Fives', score: 0, isFilled: false},
+        {name:'Sixes', score: 0, isFilled: false},
+        {name:'3 of a kind', score: 0, isFilled: false},
+        {name:'4 of a kind', score: 0, isFilled: false},
+        {name:'Full house', score: 0, isFilled: false},
+        {name:'Sm. straight', score: 0, isFilled: false},
+        {name:'Lg. straight', score: 0, isFilled: false},
+        {name:'Yahtzee', score: 0, isFilled: false},
+        {name:'Chance', score: 0, isFilled: false},
+        {name:'Yahtzee bonus', score: 0, isFilled: false}
     ]
 
+    type DiceObjectType = {
+        value: number,
+        isHeld: boolean,
+        id: string
+    }
 
     // state
-    const [dice, setDice] = useState(generateDice())
-    const [rollCount, setRollCount] = useState(2)
-    const [roundSubmitEvent, setRoundSubmitEvent] = useState(false)
-    const [scoreData, setScoreData] = useState(INITIAL_SCORE)
+    const [dice, setDice] = useState<DiceObjectType[]>(generateDice())
+    const [rollCount, setRollCount] = useState<number>(2)
+    const [roundSubmitEvent, setRoundSubmitEvent] = useState<boolean>(false)
+    const [scoreData, setScoreData] = useState<ScoreType[]>(INITIAL_SCORE)
 
     // functions for derived values
-    function includesAll(array) {
-        return array.every(v => dice.some(o => o.value === v))
+    function includesAll(array: number[]) {
+        return array.every((v: number): boolean => dice.some((o: DiceObjectType): boolean => o.value === v))
     }
-    function checkCounts(threshold) {
-        return Object.values(dieCounts).some(count => count >= threshold);
+    function checkCounts(threshold: number) {
+        return Object.values(dieCounts).some((count: number): boolean => count >= threshold);
     }
-    function checkFullHouse(array, ans) {
-        return array.every(v => ans.some(a => a === v))
+    function checkFullHouse(array: number[], ans: number[]) {
+        return array.every((v: number): boolean => ans.some((a: number): boolean => a === v))
     }
 
     // derived values
-    const addedDiceTotal = dice.reduce((total, currentDie) => {
+    const addedDiceTotal: number = dice.reduce((total: number, currentDie: DiceObjectType) => {
         return total + currentDie.value
     }, 0)
-    const upperTotal = scoreData.slice(0, 6).reduce((total, currentScoreObj) => {
-        return total + Object.values(currentScoreObj)[0]
+    const upperTotal: number = scoreData.slice(0, 6).reduce((total: number, currentScoreObj: ScoreType) => {
+        return total + currentScoreObj.score
     }, 0)
-    const upperBonus = upperTotal >= 63 ? 35 : 0
-    const lowerTotal = scoreData.slice(6, 13).reduce((total, currentScoreObj) => {
-        return total + Object.values(currentScoreObj)[0]
+    const upperBonus: 35 | 0 = upperTotal >= 63 ? 35 : 0
+    const lowerTotal: number = scoreData.slice(6, 13).reduce((total: number, currentScoreObj: ScoreType) => {
+        return total + currentScoreObj.score
     }, 0)
-    const dieCounts = dice.reduce((count, { value }) => {
-        count[value] = (count[value] || 0) + 1;
+    type DieCountKey = 1|2|3|4|5|6
+    type DieCountType = Record<DieCountKey, number>
+    const dieCounts: DieCountType = dice.reduce<DieCountType>((count, { value }) => {
+        count[value as DieCountKey] = (count[value as DieCountKey] || 0) + 1;
         return count;
-    }, {})
-    const lgStraight = includesAll([1,2,3,4,5]) || includesAll([2,3,4,5,6])
-    const smStraight = includesAll([1,2,3,4]) || includesAll([2,3,4,5]) || includesAll([3,4,5,6])
-    const threeOfKind = checkCounts(3)
-    const fourOfKind = checkCounts(4)
-    const yahtzee = checkCounts(5)
-    const fullHouse = checkFullHouse([2,3], Object.values(dieCounts))
-    const gameOver = scoreData.every(scoreObj => scoreObj.isFilled === true)
+    }, {} as DieCountType)
+    const lgStraight: boolean = includesAll([1,2,3,4,5]) || includesAll([2,3,4,5,6])
+    const smStraight: boolean = includesAll([1,2,3,4]) || includesAll([2,3,4,5]) || includesAll([3,4,5,6])
+    const threeOfKind: boolean = checkCounts(3)
+    const fourOfKind: boolean = checkCounts(4)
+    const yahtzee: boolean = checkCounts(5)
+    const fullHouse: boolean = checkFullHouse([2,3], Object.values(dieCounts))
+    const gameOver: boolean = scoreData.every((scoreObj: ScoreType): boolean => scoreObj.isFilled === true)
 
-    const lowerPointSystem = [
-        {'3 of a kind': threeOfKind, 'points': addedDiceTotal},
-        {'4 of a kind': fourOfKind, 'points': addedDiceTotal},
-        {'Full house': fullHouse, 'points': 25},
-        {'Sm. straight': smStraight, 'points': 30},
-        {'Lg. straight': lgStraight, 'points': 40},
-        {'Yahtzee': yahtzee, 'points': 50},
-        {'Chance': true, 'points': addedDiceTotal},
-        {'Yahtzee bonus': yahtzee, 'points': 100}
+    type LowerPointType = {
+        name: string,
+        value: boolean,
+        points: number
+    }
+
+    const lowerPointSystem: LowerPointType[] = [
+        {name:'3 of a kind', value: threeOfKind, points: addedDiceTotal},
+        {name:'4 of a kind', value: fourOfKind, points: addedDiceTotal},
+        {name:'Full house', value: fullHouse, points: 25},
+        {name:'Sm. straight', value: smStraight, points: 30},
+        {name:'Lg. straight', value: lgStraight, points: 40},
+        {name:'Yahtzee', value: yahtzee, points: 50},
+        {name:'Chance', value: true, points: addedDiceTotal},
+        {name:'Yahtzee bonus', value: yahtzee, points: 100}
     ]
 
-    function generateDice() {
+    function generateDice(): DiceObjectType[] {
         return new Array(5)
             .fill(0)
-            .map(() => ({
+            .map((): DiceObjectType => ({
                 value: Math.ceil(Math.random() * 6),
                 isHeld: false,
                 id: nanoid()
             }))
     }
 
-    function resetGame() {
+    function resetGame(): void {
         setDice(oldDice => oldDice.map(die => (
             die.isHeld? die : {...die, value: Math.ceil(Math.random() * 6)}
         )))
@@ -100,29 +124,30 @@ export function Yahtzee() {
         setRoundSubmitEvent(false)
     }
 
-    const range = (start, stop, step = 1) => Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
+    const range = (start: number, stop: number, step:number = 1): number[] => Array.from({ length: (stop - start) / step + 1 }, 
+                        (_, i) => start + i * step);
 
-    function hold(id) {
-        setDice(oldDice => oldDice.map(die => (
+    function hold(id: string): void {
+        setDice((oldDice: DiceObjectType[]) => oldDice.map((die: DiceObjectType) => (
             die.id == id ? {...die, isHeld: !die.isHeld} : die
         )))
     }
 
-    function roll() {
+    function roll(): void {
         setDice(oldDice => oldDice.map(die => (
             die.isHeld? die : {...die, value: Math.ceil(Math.random() * 6)}
         )))
         setRollCount(prev => prev - 1)
     }
 
-    function submitScore() {
+    function submitScore(): void {
         console.log('Score submitted!')
         setRoundSubmitEvent(true)
     }
 
-    const diceElements = dice.map(die => {
-        const dieDots = range(1, die.value)
-        const diePlacement = dieDots.map(() => {
+    const diceElements = dice.map((die: DiceObjectType) => {
+        const dieDots: number[] = range(1, die.value)
+        const diePlacement: JSX.Element[] = dieDots.map((): JSX.Element => {
             return <div key={nanoid()} className="dot"></div>
         })
         return (
@@ -137,16 +162,17 @@ export function Yahtzee() {
         )
     })
 
-    function calculateScoreUpper(category, index) {
-        if (!roundSubmitEvent || scoreData[index].isFilled !== false) return
-        const selectedNum = scoreCardNums[category.toUpperCase()]
+    function calculateScoreUpper(category: CategoryName, index: number): void {
+        if (!roundSubmitEvent || (typeof scoreData[index] !== "undefined" && scoreData[index].isFilled !== false)) return
+        const key = category.toUpperCase() as keyof typeof scoreCardNums
+        const selectedNum: scoreCardNums = scoreCardNums[key]
         console.log('Score data updating...')
-        const calculatedScore = dice.reduce((total, currentDie) => {
+        const calculatedScore: number = dice.reduce((total: number, currentDie: DiceObjectType) => {
             if (currentDie.value === selectedNum) return total + currentDie.value
             return total
         }, 0)
-        setScoreData(prevScoreData => prevScoreData.map(scoreObj => {
-            if (scoreObj[category] !== undefined) return {...scoreObj, [category]: calculatedScore, 'isFilled': true}
+        setScoreData((prevScoreData: ScoreType[]) => prevScoreData.map((scoreObj: ScoreType) => {
+            if (scoreObj.name === category) return {...scoreObj, score: calculatedScore, isFilled: true}
             return scoreObj
         }))
         setRoundSubmitEvent(false)
@@ -154,18 +180,24 @@ export function Yahtzee() {
         setRollCount(2)
     }
 
-    function calculateScoreLower(category, index) {
-        if (!roundSubmitEvent || scoreData[index + 6].isFilled !== false) return
-        if (category === 'Yahtzee bonus' && scoreData[11].isFilled === false) return
-        if (lowerPointSystem[index][category] !== true) {
-            setScoreData(prevScoreData => prevScoreData.map(scoreObj => {
-                if (scoreObj[category] !== undefined) return {...scoreObj, [category]: 0, 'isFilled': true}
+    function calculateScoreLower(category: CategoryName, index: number): void {
+        const lowerScoreObj: ScoreType | undefined = scoreData[index + 6]
+        const bonusScoreObj: ScoreType | undefined = scoreData[11]
+        if (!roundSubmitEvent || (typeof lowerScoreObj !== "undefined" 
+                && lowerScoreObj.isFilled !== false)) return
+        if (category === 'Yahtzee bonus' && (typeof bonusScoreObj !== "undefined" 
+                && bonusScoreObj.isFilled === false)) return
+        const lowerPointSystemObj: LowerPointType | undefined = lowerPointSystem[index]
+        if (typeof lowerPointSystemObj !== "undefined") console.log(lowerPointSystemObj.points)
+        if (typeof lowerPointSystemObj !== "undefined" && lowerPointSystemObj.name === category && lowerPointSystemObj.value !== true) {
+            setScoreData((prevScoreData: ScoreType[]) => prevScoreData.map((scoreObj: ScoreType) => {
+                if (scoreObj.name === category) return {...scoreObj, score: 0, isFilled: true}
                 return scoreObj
             }))
         } else {
-            console.log(lowerPointSystem[index].points)
             setScoreData(prevScoreData => prevScoreData.map(scoreObj => {
-                if (scoreObj[category] !== undefined) return {...scoreObj, [category]: lowerPointSystem[index].points, 'isFilled': true}
+                if (typeof lowerPointSystemObj === "undefined") return scoreObj
+                if (scoreObj.name === category) return {...scoreObj, score: lowerPointSystemObj.points, isFilled: true}
                 return scoreObj
             }))
         }
@@ -174,25 +206,27 @@ export function Yahtzee() {
         setRollCount(2)
     }
 
-    const upperScoreElements = scoreData.slice(0, 6).map((scoreObj, index) => {
-        const [category, value] = Object.entries(scoreObj)[0]
+    const upperScoreElements: JSX.Element[] = scoreData.slice(0, 6).map((scoreObj: ScoreType, index: number): JSX.Element => {
+        const category: CategoryName = scoreObj.name
+        const value: number = scoreObj.score
         return (
             <span key={category} className={roundSubmitEvent ? 'selectable' : ''} 
             onClick={() => calculateScoreUpper(category, index)}>
                 <p>{category}</p>
-                <p>{scoreData[index].isFilled ? value : ''}</p>
+                <p>{scoreObj.isFilled ? value : ''}</p>
             </span>
         )
     })
 
-    const lowerScoreElements = scoreData.slice(6, 14).map((scoreObj, index) => {
-        const [category, value] = Object.entries(scoreObj)[0]
+    const lowerScoreElements: JSX.Element[] = scoreData.slice(6, 14).map((scoreObj: ScoreType, index: number): JSX.Element => {
+        const category: CategoryName = scoreObj.name
+        const value: number = scoreObj.score
         return (
             <span key={category} className={roundSubmitEvent ? 'selectable' : ''}
             onClick={() => calculateScoreLower(category, index)}
             >
                 <p>{category}</p>
-                <p>{scoreData[index + 6].isFilled ? value : ''}</p>
+                <p>{scoreObj.isFilled ? value : ''}</p>
             </span>
         )
     })

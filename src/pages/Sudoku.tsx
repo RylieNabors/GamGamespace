@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react"
 import { clsx } from 'clsx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
+import type {JSX} from "react"
 
-export function Sudoku() {
+export function Sudoku(): JSX.Element {
     // placeholder data
-    let board_nums_placeholder = [
+    /*let board_nums_placeholder = [
         "007491605",
         "200060309",
         "000007010",
@@ -28,33 +29,34 @@ export function Sudoku() {
         "934176852",
         "675832941",
         "812945763"
-    ]
+    ]*/
 
     // state
-    const [boardNums, setBoardNums] = useState([])
-    const [solution, setSolution] = useState([])
-    const [selectedNum, setSelectedNum] = useState(0)
-    const [errorCount, setErrorCount] = useState(0)
-    const [finishedNums, setFinishedNums] = useState("")
-    const [start, setStart] = useState(true)
-    const [hintAvailable, setHintAvailable] = useState(true)
-    const [hintShowing, setHintShowing] = useState(false)
+    const [boardNums, setBoardNums] = useState<string[]>([])
+    const [solution, setSolution] = useState<string[]>([])
+    const [selectedNum, setSelectedNum] = useState<number>(0)
+    const [errorCount, setErrorCount] = useState<number>(0)
+    const [finishedNums, setFinishedNums] = useState<string>("")
+    const [start, setStart] = useState<boolean>(true)
+    const [hintAvailable, setHintAvailable] = useState<boolean>(true)
+    const [hintShowing, setHintShowing] = useState<boolean>(false)
     console.log('Sudoku rendered...')
 
     // static values
-    const numbers = "123456789"
+    const numbers: "123456789" = "123456789"
 
     // refs
-    const puzzleGenerated = useRef(false)
-    const initialPuzzle = useRef([])
-    const difficulty = useRef("")
+    const puzzleGenerated = useRef<boolean>(false)
+    const initialPuzzle = useRef<string[]>([])
+    const difficulty = useRef<string>("")
     console.log('initial puzzle: ' + initialPuzzle.current)
 
     // bool
-    const has9ofSelectedNum = selectedNum !== 0 ? boardNums.join('').split(selectedNum.toString()).length - 1 === 9 : false;
-    const selectedNumFinished = finishedNums.includes(selectedNum)
-    const hasHitMaxErrors = errorCount === 3
-    const gameFinished = boardNums.length !== 0 && solution.length === boardNums.length && solution.every((v, i) => v === boardNums[i] && v !=='0');
+    const has9ofSelectedNum: boolean = selectedNum !== 0 ? boardNums.join('').split(selectedNum.toString()).length - 1 === 9 : false;
+    const selectedNumFinished: boolean = finishedNums.includes(selectedNum.toString())
+    const hasHitMaxErrors: boolean = errorCount === 3
+    const gameFinished: boolean = boardNums.length !== 0 && solution.length === boardNums.length 
+                        && solution.every((v: string, i: number) => v === boardNums[i] && v !=='0');
 
     console.log('Game finished? :')
     console.log(gameFinished)
@@ -74,17 +76,34 @@ export function Sudoku() {
     }
 
     useEffect(() => {
+        type GridArray = {
+            value: number[][],
+            solution: number[][],
+            difficulty: string
+        }
+
+        type SudokuResponse = {
+            newboard: {
+                grids: GridArray[],
+                results: number
+            }
+        }
+
         if (puzzleGenerated.current === false) {
             if (!start) return
             console.log('start true -- data is being fetched!')
             async function getPuzzle() {
                 try {
-                    const response = await fetch('https://sudoku-api.vercel.app/api/dosuku')
-                    const data = await response.json()
-                    const formattedSolution = data.newboard.grids[0].solution.map(row => {
+                    const response: Response = await fetch('https://sudoku-api.vercel.app/api/dosuku')
+                    if (!response.ok) throw new Error('Error: Sudoku API response invalid')
+                    const data: SudokuResponse = await response.json()
+                    if (!data || !data?.newboard.grids.length || data.newboard.grids[0] === undefined) {
+                        throw new Error('Error: Data undefined or empty')
+                    }
+                    const formattedSolution: string[] = data.newboard.grids[0].solution.map((row: number[]): string => {
                         return row.map(String).join("")
                     })
-                    const formattedBoard = data.newboard.grids[0].value.map(row => {
+                    const formattedBoard: string[] = data.newboard.grids[0].value.map((row: number[]): string => {
                         return row.map(String).join("")
                     })
 
@@ -93,7 +112,11 @@ export function Sudoku() {
                     setSolution(formattedSolution)
                     difficulty.current = data.newboard.grids[0].difficulty
                 } catch(err) {
-                    console.log(err)
+                    if (!(err instanceof Error)) {
+                        console.error("Unknown error")
+                        return
+                    }
+                    console.error(err)
                 }
             }
             getPuzzle()
@@ -107,11 +130,13 @@ export function Sudoku() {
             */
 
             setStart(false)
-            return () => puzzleGenerated.current = true
+            return () =>  {
+                puzzleGenerated.current = true
+            }
         }
     }, [start])
 
-    function resetGame() {
+    function resetGame(): void {
         console.log('game resetting')
         puzzleGenerated.current = false
         setStart(true)
@@ -120,33 +145,39 @@ export function Sudoku() {
         setHintAvailable(true)
     }
 
-    function insertIntoBoard(cell, rIndex, cIndex) {
+    function insertIntoBoard(cell: string, rIndex: number, cIndex: number) {
        console.log('Board update function called')
        if (hintShowing) {
             console.log('Showing hint!')
-            setBoardNums(prev => {
-                const newArr = [...prev]
-                newArr[rIndex] = [...prev[rIndex]];
-                newArr[rIndex][cIndex] = solution[rIndex][cIndex];
-                const joinedString = newArr[rIndex].join('')
-                newArr[rIndex] = joinedString
-                return newArr;
+            setBoardNums((prev: string[]) => {
+                const newArr: string[] = [...prev]
+                const row: string | undefined = prev[rIndex]
+                if (!row || !solution[rIndex]) return prev
+                const value: string = String(solution[rIndex][cIndex])
+                newArr[rIndex] = 
+                    row.slice(0, cIndex) +
+                    value +
+                    row.slice(cIndex + 1)
+                return newArr
             })
             setHintShowing(false)
             return
        }
 
-       const cellHas9Matches = boardNums.join('').split(cell.toString()).length - 1 === 9
+       const cellHas9Matches: boolean = boardNums.join('').split(cell.toString()).length - 1 === 9
        if (cell !== '0' && !cellHas9Matches){
             console.log('Changing selected number!')
-            setSelectedNum(cell)
+            setSelectedNum(Number(cell))
        }
 
        // determining if it was previously guessed and if that previous guess was wrong
-       const prevGuessedNum = cell !== initialPuzzle.current[rIndex][cIndex] && cell !== '0'
-       const prevGuessWrong = prevGuessedNum && cell !== solution[rIndex][cIndex]
+       let prevGuessedNum: boolean = typeof initialPuzzle.current[rIndex] === "string" 
+                && cell !== initialPuzzle.current[rIndex][cIndex] && cell !== '0'
+       const prevGuessWrong: boolean = typeof solution[rIndex] === "string"
+                && prevGuessedNum && cell !== solution[rIndex][cIndex]
        // determining if current guess is wrong (not stored as a guess yet)
-       const isWrong = cell === '0' && selectedNum !== solution[rIndex][cIndex]
+       const isWrong: boolean = typeof solution[rIndex] === "string" 
+                && cell === '0' && String(selectedNum) !== solution[rIndex][cIndex]
 
        if (isWrong) {
             console.log('Wrong guess!')
@@ -156,37 +187,40 @@ export function Sudoku() {
             // reselecting number after wrong answer clears answer
             if (prevGuessWrong && cell === selectedNum.toString()) {
                 console.log('Board Resetting Wrong cell!')
-                setBoardNums(prev => {
-                    const newArr = [...prev]
-                    newArr[rIndex] = [...prev[rIndex]];
-                    newArr[rIndex][cIndex] = 0;
-                    const joinedString = newArr[rIndex].join('')
-                    newArr[rIndex] = joinedString
-                    return newArr;
+                setBoardNums((prev: string[]) => {
+                    const newArr: string[] = [...prev]
+                    const row: string | undefined = prev[rIndex]
+                    if (!row) return prev
+                    newArr[rIndex] = row.slice(0, cIndex) + '0' + row.slice(cIndex + 1)
+                    return newArr
                 })
             // normal update to answer
             } else {
                 console.log('Board updating!')
-                setBoardNums(prev => {
-                    const newArr = [...prev]
-                    newArr[rIndex] = [...prev[rIndex]];
-                    newArr[rIndex][cIndex] = selectedNum;
-                    const joinedString = newArr[rIndex].join('')
-                    newArr[rIndex] = joinedString
+                setBoardNums((prev: string[]) => {
+                    const newArr: string[] = [...prev]
+                    const row: string | undefined = prev[rIndex]
+                    if (!row) return prev
+                    newArr[rIndex] = 
+                        row.slice(0, cIndex) +
+                        selectedNum.toString() +
+                        row.slice(cIndex + 1)
                     return newArr;
                 })
             }
         }
     }
 
-    const board = boardNums.map((row, rIndex) => {
-        return row.split("").map((cell, cIndex) => {
-            const guessedNum = cell !== initialPuzzle.current[rIndex][cIndex]
-            const isWrong = guessedNum && cell !== solution[rIndex][cIndex]
-            const isRight = guessedNum && cell === solution[rIndex][cIndex]
-            const numMatch = cell === selectedNum.toString() && selectedNum !== 0 && cell === solution[rIndex][cIndex]
+    const board = boardNums.map((row: string, rIndex: number) => {
+        return row.split("").map((cell: string, cIndex: number) => {
+            const guessedNum: boolean = typeof initialPuzzle.current[rIndex] === "string" 
+                    && cell !== initialPuzzle.current[rIndex][cIndex]
+            const isWrong: boolean = typeof solution[rIndex] === "string" && guessedNum && cell !== solution[rIndex][cIndex]
+            const isRight: boolean = typeof solution[rIndex] === "string" && guessedNum && cell === solution[rIndex][cIndex]
+            const numMatch: boolean = typeof solution[rIndex] === "string" && cell === selectedNum.toString() 
+                    && selectedNum !== 0 && cell === solution[rIndex][cIndex]
 
-            const boardNumClassName = clsx({
+            const boardNumClassName: string = clsx({
                 right_guess: isRight,
                 wrong_guess: isWrong,
                 tile: true,
@@ -200,7 +234,7 @@ export function Sudoku() {
                     id={rIndex.toString() + '-' + cIndex.toString()} 
                     className={boardNumClassName}
                     onClick={() => insertIntoBoard(cell, rIndex, cIndex)}
-                    value={cell}
+                    //value={cell}
                 >
                 {cell !== '0' ? cell : ''}
                 </div>
@@ -208,17 +242,17 @@ export function Sudoku() {
         })
     })
 
-    function selectNumber(e) {
-        e.target.value === selectedNum ? setSelectedNum(0) : setSelectedNum(e.target.value)
+    function selectNumber(e: React.MouseEvent<HTMLButtonElement>) {
+        e.currentTarget.value === String(selectedNum) ? setSelectedNum(0) : setSelectedNum(Number(e.currentTarget.value))
     }
 
     
-    const number_options = numbers.split("").map(num => {
-        const isDisabledNum = finishedNums.includes(num)
-        const isDisabled = isDisabledNum || gameFinished || hasHitMaxErrors
-        const numberClassName = clsx({
-            num_selected: num === selectedNum,
-            not_num_selected: num !== selectedNum,
+    const number_options: JSX.Element[] = numbers.split("").map((num: string): JSX.Element => {
+        const isDisabledNum: boolean = finishedNums.includes(num)
+        const isDisabled: boolean = isDisabledNum || gameFinished || hasHitMaxErrors
+        const numberClassName: string = clsx({
+            num_selected: Number(num) === selectedNum,
+            not_num_selected: Number(num) !== selectedNum,
             disabled: isDisabledNum || isDisabled,
             number: true
         })
@@ -235,13 +269,13 @@ export function Sudoku() {
         )
     })
 
-    const gameOverClassName = clsx({
+    const gameOverClassName: string = clsx({
         won: gameFinished,
         lost: hasHitMaxErrors,
         gameOver: true
     })
 
-    function showHint() {
+    function showHint(): void {
         setHintShowing(true)
         setHintAvailable(false)
     }
