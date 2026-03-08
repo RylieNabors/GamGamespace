@@ -154,7 +154,7 @@ main.home-menu-container > section.home-menu-box > div.home-menu-div:nth-child(1
 }
 
 main.home-menu-container > section.home-menu-box > div.home-menu-div:nth-child(2) > a > div {
-    background-image: url("/images/background.jpg");
+    background-image: url("/images/yahtzee.png");
 }
 
 main.home-menu-container > section.home-menu-box > div.home-menu-div:nth-child(3) > a > div {
