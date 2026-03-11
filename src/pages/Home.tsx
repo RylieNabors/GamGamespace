@@ -5,9 +5,7 @@ import '../css/index.css'
 import type {JSX} from "react"
 
 export function Home(): JSX.Element {
-    console.log(gameData)
     const gameOptions: JSX.Element[] = gameData.map((game: gameDataType): JSX.Element => {
-        console.log(game.imgUrl)
         return (
             <div key={game.id} className="home-menu-div">
                 <Link to={game.linkUrl}>

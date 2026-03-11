@@ -15,7 +15,6 @@ export function Layout(): JSX.Element {
     const menuClassName: string = clsx({
         menuHidden: navShown === false,
     })
-    console.log(navShown)
 
     return (
         <>

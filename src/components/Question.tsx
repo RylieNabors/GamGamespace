@@ -37,6 +37,7 @@ export function Question() {
     const [score, setScore] = useState<number>(0)
     const [qIndex, setQIndex] = useState<number>(0)
     const [showHintBool, setShowHintBool] = useState<Boolean>(false)
+    const [hintOpened, setHintOpened] = useState<boolean>(false)
 
     // Derived values
     const gameOver: boolean = false
@@ -101,6 +102,7 @@ export function Question() {
     function incrementIndex(): void {
         console.log('incrementing index')
         if (qIndex < questions.length) setQIndex(prevIndex => prevIndex + 1)
+        setHintOpened(false)
         setShowHintBool(false)
     }
 
@@ -114,9 +116,11 @@ export function Question() {
         ;(formEl as HTMLFormElement).reset()
     }
 
-    function showHint(): void {
+    function openHint(): void {
+        setHintOpened(true)
+        if (score <= 0) return
         setShowHintBool(true)
-        //if (score !== 0) setScore(prevScore => prevScore - 1)
+        setScore(prev => prev - 1)
     }
 
     const answerElements: JSX.Element[] | undefined =  questions[qIndex]?.answers.map((answer: string, index: number): JSX.Element => {
@@ -159,17 +163,21 @@ export function Question() {
                 <p className="question-count">Question {qIndex + 1}/{questions.length}</p>
                 <p className="question-level">{questions[qIndex]?.category || '...Loading Category'}</p>
                 <span>{score} pts
-                <button title="Hint" onClick={showHint}><FontAwesomeIcon icon={faLightbulb} /></button>
+                <button title="Hint" onClick={openHint}><FontAwesomeIcon icon={faLightbulb} /></button>
                 </span>
             </header>
 
-            {showHintBool? <QuizHint 
+            { hintOpened && showHintBool? <QuizHint 
                     question={questions[qIndex]?.question} 
-                    score={score}
                     answer={questions[qIndex]?.correct}
-                    closeHint={setShowHintBool}
-                    setScore={setScore}/> 
-                : null }
+                    closeHint={setHintOpened}/> 
+                : hintOpened ? (
+                    <div className="hint_section not_available">
+                        <h3>"You must have at least 1pt to view hint!"</h3>
+                        <p>Try again later</p>
+                        <button onClick={()=> setHintOpened(false)}>&#10006;</button>
+                    </div>
+                ) : null}
 
             <h1 className="question">{questions[qIndex]?.question || '...Loading Question'}</h1>
 
