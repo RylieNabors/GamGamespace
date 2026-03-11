@@ -1,12 +1,13 @@
 import "../css/sudoku.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Fragment } from "react";
 import { clsx } from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import type { JSX } from "react";
 import type { GridArray, SudokuResponse } from "../entities.js";
-import { useQuery } from "@tanstack/react-query";
 import { useSudokuResponse } from "../hooks/useSudokuResponse.js";
+import { BoardNum } from "../components/BoardNum.js";
+import { SudokuHeader } from "../components/SudokuHeader.js";
 
 export function Sudoku(): JSX.Element {
   // placeholder data
@@ -67,14 +68,6 @@ export function Sudoku(): JSX.Element {
     solution.length === boardNums.length &&
     solution.every((v: string, i: number) => v === boardNums[i] && v !== "0");
 
-  console.log("Game finished? :");
-  console.log(gameFinished);
-
-  console.log(selectedNum);
-  console.log("Finished Nums:");
-  console.log(finishedNums);
-  console.log("Is 9 of selected num on board :  " + has9ofSelectedNum);
-  console.log("Is selected num finished " + selectedNumFinished);
   if (has9ofSelectedNum && !selectedNumFinished) {
     console.log(`Number ${selectedNum} finished!`);
     setFinishedNums((prev) => {
@@ -105,7 +98,6 @@ export function Sudoku(): JSX.Element {
         return row.map(String).join("");
       },
     );
-
     initialPuzzle.current = formattedBoard;
     setBoardNums(formattedBoard);
     setSolution(formattedSolution);
@@ -125,54 +117,6 @@ export function Sudoku(): JSX.Element {
   if (isError) {
     return <h1>{error ? error.message : null}</h1>;
   }
-
-  /*useEffect(() => {
-        if (puzzleGenerated.current === false) {
-            if (!start) return
-            console.log('start true -- data is being fetched!')
-            async function getPuzzle() {
-                try {
-                    const response: Response = await fetch('https://sudoku-api.vercel.app/api/dosuku')
-                    if (!response.ok) throw new Error('Error: Sudoku API response invalid')
-                    const data: SudokuResponse = await response.json()
-                    if (!data || !data?.newboard.grids.length || data.newboard.grids[0] === undefined) {
-                        throw new Error('Error: Data undefined or empty')
-                    }
-                    const formattedSolution: string[] = data.newboard.grids[0].solution.map((row: number[]): string => {
-                        return row.map(String).join("")
-                    })
-                    const formattedBoard: string[] = data.newboard.grids[0].value.map((row: number[]): string => {
-                        return row.map(String).join("")
-                    })
-
-                    initialPuzzle.current = formattedBoard
-                    setBoardNums(formattedBoard)
-                    setSolution(formattedSolution)
-                    difficulty.current = data.newboard.grids[0].difficulty
-                } catch(err) {
-                    if (!(err instanceof Error)) {
-                        console.error("Unknown error")
-                        return
-                    }
-                    console.error(err)
-                }
-            }
-            getPuzzle()
-
-            // placeholder
-            
-            console.log('Data would be fetched here!')
-            initialPuzzle.current = board_nums_placeholder
-            setBoardNums(board_nums_placeholder)
-            setSolution(solution_nums_placeholder)
-            
-
-            setStart(false)
-            return () =>  {
-                puzzleGenerated.current = true
-            }
-        }
-    }, [start])*/
 
   function resetGame(): void {
     console.log("game resetting");
@@ -281,15 +225,15 @@ export function Sudoku(): JSX.Element {
         matches_selected: numMatch,
       });
       return (
-        <div
-          key={rIndex.toString() + "-" + cIndex.toString()}
-          id={rIndex.toString() + "-" + cIndex.toString()}
-          className={boardNumClassName}
-          onClick={() => insertIntoBoard(cell, rIndex, cIndex)}
-          //value={cell}
-        >
-          {cell !== "0" ? cell : ""}
-        </div>
+        <Fragment key={rIndex.toString() + "-" + cIndex.toString()}>
+          <BoardNum
+            rIndex={rIndex}
+            cIndex={cIndex}
+            className={boardNumClassName}
+            insertFunction={insertIntoBoard}
+            cellValue={cell}
+          />
+        </Fragment>
       );
     });
   });
@@ -338,20 +282,12 @@ export function Sudoku(): JSX.Element {
 
   return (
     <>
-      <section className="sudoku-head">
-        <h1>Sudoku</h1>
-        <span>
-          {`${difficulty.current || "...Loading"}  |`}
-          <h2>{`Mistakes: ${errorCount}/3`}</h2>
-          <button
-            onClick={showHint}
-            disabled={!hintAvailable}
-            title="Show Hint"
-          >
-            <FontAwesomeIcon icon={faLightbulb} />
-          </button>
-        </span>
-      </section>
+      <SudokuHeader
+        difficulty={difficulty.current}
+        errorCount={errorCount}
+        showHint={showHint}
+        isButtonDisabled={!hintAvailable}
+      />
       <hr />
       <div className="board">
         {gameFinished || hasHitMaxErrors ? (

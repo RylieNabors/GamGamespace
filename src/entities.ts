@@ -34,3 +34,39 @@ export type SudokuResponse = {
     results: number;
   };
 };
+
+// Yahtzee
+export type LowerCategoryName =
+  | "Aces"
+  | "Twos"
+  | "Threes"
+  | "Fours"
+  | "Fives"
+  | "Sixes";
+export type UpperCategoryName =
+  | "3 of a kind"
+  | "4 of a kind"
+  | "Full house"
+  | "Sm. straight"
+  | "Lg. straight"
+  | "Yahtzee"
+  | "Chance"
+  | "Yahtzee bonus";
+export type CategoryName = LowerCategoryName | UpperCategoryName;
+export type ScoreType = {
+  name: CategoryName;
+  score: number;
+  isFilled: boolean;
+};
+
+export type DiceObjectType = {
+  value: number;
+  isHeld: boolean;
+  id: string;
+};
+
+export type LowerPointType = {
+  name: string;
+  value: boolean;
+  points: number;
+};

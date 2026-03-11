@@ -1,18 +1,17 @@
 import "../css/quiz.css";
 import { QuizSummary } from "./QuizSummary.js";
 import { QuizHint } from "./QuizHint.js";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect, useRef } from "react";
 import { clsx } from "clsx";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import type { JSX } from "react";
-import type {ResultsType, ResponseType, QuestionType} from "../entities.ts"
+import type { ResultsType, ResponseType, QuestionType } from "../entities.ts";
 import { useQuestionResponse } from "../hooks/useQuestionResponse.js";
+import { Answer } from "./Answer.js";
+import { QuestionHeader } from "./QuestionHeader.js";
 
 export function Question() {
-
   // state values
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
@@ -34,8 +33,7 @@ export function Question() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const { width, height } = useWindowSize();
-
-  const {data, isLoading, isError, error, refetch} = useQuestionResponse()
+  const { data, isLoading, isError, error, refetch } = useQuestionResponse();
 
   useEffect(() => {
     if (!data) return;
@@ -55,10 +53,6 @@ export function Question() {
   if (isError) {
     return <h1>{error ? error.message : null}</h1>;
   }
-
-  console.log("Question rendered...");
-  console.log("Score" + score);
-  console.log("Guessed: " + isGuessed);
 
   function incrementIndex(): void {
     console.log("incrementing index");
@@ -99,20 +93,12 @@ export function Question() {
     });
     return (
       <div key={index} className="opt">
-        <input
-          type="radio"
-          name="answer"
-          id={String.fromCharCode(65 + index)}
-          className="answer"
-          value={answer || "...Loading answer"}
-          disabled={isGuessed}
+        <Answer
+          index={index}
+          answer={answer}
+          isGuessed={isGuessed}
+          answerClassName={answerClassName}
         />
-        <label
-          className={answerClassName}
-          htmlFor={String.fromCharCode(65 + index)}
-        >
-          {answer || "answer"}
-        </label>
       </div>
     );
   });
@@ -136,20 +122,13 @@ export function Question() {
     <main className="main-container">
       {isUserCorrect ? <Confetti width={width} height={height} /> : undefined}
       <section className="question-box quiz-container">
-        <header>
-          <p className="question-count">
-            Question {qIndex + 1}/{questions.length}
-          </p>
-          <p className="question-level">
-            {questions[qIndex]?.category || "...Loading Category"}
-          </p>
-          <span>
-            {score} pts
-            <button title="Hint" onClick={openHint}>
-              <FontAwesomeIcon icon={faLightbulb} />
-            </button>
-          </span>
-        </header>
+        <QuestionHeader
+          index={qIndex + 1}
+          length={questions.length}
+          category={questions[qIndex]?.category}
+          score={score}
+          openHint={openHint}
+        />
 
         {hintOpened && showHintBool ? (
           <QuizHint
